@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verify Certificate · HackIndia</title>
+<meta name="description" content="Check that a HackIndia certificate is real." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<style>
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 8px 32px 96px; }
+  .status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 18px; }
+  .status h1 { font-size: clamp(28px, 3.4vw, 42px); }
+  .details { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 18px; padding: 6px; }
+  .details div { padding: 14px 16px; }
+  .details div + div { box-shadow: -1px 0 0 var(--ring); }
+  .details b { display: block; font-weight: 500; font-size: 15px; margin-top: 2px; overflow-wrap: anywhere; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .empty { max-width: 560px; margin: 48px auto; padding: 28px; }
+  .empty .linkbox input { flex: 1; border: 0; background: transparent; outline: none; min-width: 0; }
+  .bad-note { padding: 18px 20px; margin-top: 18px; color: var(--bad); background: var(--bad-tint); border-radius: 14px; font-size: 15px; }
+  @media (max-width: 760px) { .details { grid-template-columns: 1fr 1fr; } .details div:nth-child(3) { box-shadow: none; } }
+  @media (max-width: 560px) { .wrap, .top { padding-left: 16px; padding-right: 16px; } .actions .btn { flex: 1 1 calc(50% - 10px); } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html" style="color:inherit;text-decoration:none"><span class="mark"></span>HackIndia <small>· Certificate check</small></a>
+</header>
+
+<main class="wrap" id="main">
+  <div class="card empty rise" id="empty" hidden>
+    <h1 style="font-size:34px">Check a <em>certificate.</em></h1>
+    <p class="lede" style="font-size:16px">Scan the QR code on the certificate, or paste its verify link here.</p>
+    <form class="linkbox" id="paste" style="margin-top:18px"><input id="pasteIn" placeholder="https://…/verify.html#…" aria-label="Verify link" /><button class="btn primary" type="submit">Check</button></form>
+  </div>
+
+  <section id="result" hidden>
+    <div class="status rise">
+      <h1 id="title"></h1>
+      <span class="pill" id="pill"><span class="dot"></span><span id="pillText"></span></span>
+    </div>
+    <div class="stage rise" style="animation-delay:.08s"><canvas id="cv" width="1600" height="1130" aria-label="Certificate"></canvas></div>
+    <div id="badNote" class="bad-note" hidden></div>
+    <div class="card details rise" id="details" style="animation-delay:.16s"></div>
+    <div class="actions rise" id="actions" style="animation-delay:.22s">
+      <a class="btn li" id="liAdd" target="_blank" rel="noopener">Add to LinkedIn profile</a>
+      <a class="btn" id="liShare" target="_blank" rel="noopener">Share post</a>
+      <button class="btn primary rel" id="dlVideo" type="button"><span>Download video</span><i class="bar"></i></button>
+      <button class="btn" id="dlPng" type="button">Download PNG</button>
+      <button class="btn" id="replay" type="button">Replay</button>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js"></script>
+<script src="public-key.js"></script>
+<script src="sign.js"></script>
+<script src="cert.js"></script>
+<script src="export.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  let cert = null, start = performance.now(), running = false;
+
+  function frame() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    Cert.render(ctx, cert, (performance.now() - start) / 1000, { theme: 'paper', loop: false });
+    requestAnimationFrame(frame);
+  }
+
+  async function check(token) {
+    if (!token) { $('empty').hidden = false; $('result').hidden = true; return; }
+    const res = await CertSign.verifyToken(token);
+    $('empty').hidden = true; $('result').hidden = false;
+    if (!res.cert) { $('result').hidden = true; $('empty').hidden = false; toast(res.reason); return; }
+    cert = { ...res.cert, verifyUrl: location.href };
+    const tier = Cert.TIERS[cert.tier] || Cert.TIERS.participant;
+    document.title = res.ok ? `${cert.name} · ${tier.label} · ${cert.event}` : 'Not valid · HackIndia certificate check';
+    $('title').textContent = res.ok ? `${cert.name}, ${tier.label}` : 'This certificate is not valid';
+    $('pill').className = 'pill ' + (res.ok ? 'ok' : 'bad');
+    $('pillText').textContent = res.ok ? 'Verified · signed by HackIndia' : 'Not verified';
+    $('badNote').hidden = res.ok;
+    $('badNote').textContent = res.ok ? '' : `${res.reason} Do not trust the name or rank shown on it.`;
+    $('actions').hidden = !res.ok;
+    cv.style.filter = res.ok ? '' : 'grayscale(1) opacity(.55)';
+    const rows = [['Certificate ID', cert.id], ['Achievement', tier.label + (cert.rank ? ` (${cert.rank})` : '')], ['Event', cert.event], ['Date', Cert.fmtDate(cert.date)]];
+    if (cert.project) rows.push(['Project', cert.project]);
+    if (cert.team) rows.push(['Team', cert.team]);
+    if (cert.venue) rows.push(['Venue', cert.venue]);
+    $('details').innerHTML = '';
+    rows.slice(0, 8).forEach(([k, v]) => { const d = document.createElement('div'); d.innerHTML = '<span class="label"></span><b></b>'; d.firstChild.textContent = k; d.lastChild.textContent = v; $('details').appendChild(d); });
+    $('liAdd').href = CertExport.linkedInAddUrl(cert);
+    $('liShare').href = CertExport.linkedInShareUrl(cert);
+    start = performance.now();
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  }
+
+  $('paste').onsubmit = (e) => { e.preventDefault(); const v = $('pasteIn').value.trim(); const i = v.indexOf('#'); location.hash = i >= 0 ? v.slice(i + 1) : v; };
+  window.addEventListener('hashchange', () => check(location.hash.slice(1)));
+  $('replay').onclick = () => (start = performance.now());
+  $('dlPng').onclick = async () => CertExport.download(await CertExport.exportPNG(cert, 'paper'), CertExport.fileBase(cert) + '.png');
+  $('dlVideo').onclick = async () => {
+    const btn = $('dlVideo'), label = btn.querySelector('span'), bar = btn.querySelector('.bar');
+    btn.disabled = true; label.textContent = 'Recording…';
+    try { const b = await CertExport.exportVideo(cert, 'paper', (p) => (bar.style.width = p * 100 + '%')); CertExport.download(b, CertExport.fileBase(cert) + '.' + CertExport.ext(b)); toast(`Saved ${(b.size / 1048576).toFixed(2)} MB video`); }
+    catch (e) { toast(e.message || 'Could not record video'); }
+    btn.disabled = false; label.textContent = 'Download video'; bar.style.width = '0';
+  };
+
+  let tt;
+  function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 3000); }
+
+  Cert.ready().then(() => check(location.hash.slice(1)));
+})();
+</script>
+</body>
+</html>
