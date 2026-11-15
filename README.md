@@ -14,12 +14,16 @@ python3 -m http.server 8890 --directory hackindia-cert
 
 Then open http://localhost:8890. On your own computer the studio signs with `issuer-key.js`, so no passcode is needed.
 
+## Deploys
+
+The GitHub repo is connected to Vercel. Every push to `main` updates the live site by itself. Pushes to other branches get their own preview link.
+
 ## How signing works on the live site
 
 - The private key is **not** on the website. It is stored in the Vercel secret `ISSUER_PRIVATE_JWK`.
 - The studio sends certificates to `api/sign`. That only works with the issuer passcode (Vercel secret `ISSUER_PASSCODE`). Your copy is in `.issuer-passcode`, which is never uploaded.
 - Anyone can open the studio and preview a certificate, but nobody can sign one without the passcode.
-- To change the passcode: `npx vercel env rm ISSUER_PASSCODE production`, then `npx vercel env add ISSUER_PASSCODE production`, then `npx vercel deploy --prod`.
+- To change the passcode: `npx vercel env rm ISSUER_PASSCODE production`, then `npx vercel env add ISSUER_PASSCODE production`, then push any commit to `main` (or run `npx vercel deploy --prod`).
 
 ## What it does
 
