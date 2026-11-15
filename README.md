@@ -52,5 +52,5 @@ The GitHub repo is connected to Vercel. Every push to `main` updates the live si
 
 ## Still to do
 
-1. Optional: point a custom domain (like `certificates.hackindia.xyz`) at the Vercel project.
+1. Optional: point a custom domain (like `certificates.hackindia.org`) at the Vercel project.
 2. Optional: add a short-link service (`/v/HI26-XXXX`). The QR code gets much simpler, and you can cancel a certificate later.
