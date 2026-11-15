@@ -3,3 +3,4 @@ issuer-key.js
 .vercel
 .env*
 dist/
+.DS_Store
