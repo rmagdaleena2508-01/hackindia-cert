@@ -6,20 +6,21 @@
   const LOOP = 9; // seconds; every moving thing repeats exactly every 9s, so the video loops with no jump
 
   const C = {
-    orange: '#FF6A13', deep: '#E4500A', amber: '#FFB23E',
-    green: '#14A049', emerald: '#0A6B35', mint: '#8FE3A9',
+    // orange and green are the exact colors from the official HackIndia logo; the others are shades of them
+    orange: '#FF6600', deep: '#DB4C00', amber: '#FFB23E',
+    green: '#137807', emerald: '#0B5204', mint: '#A6DC98',
   };
 
   const THEMES = {
     paper: {
       bg: '#FFF8EF', card: '#FFFFFF', ink: '#1B140F', ink2: 'rgba(27,20,15,.68)', ink3: 'rgba(27,20,15,.46)',
       line: 'rgba(27,20,15,.10)', dot: 'rgba(27,20,15,.13)', blobA: 0.30, ribbonA: 0.15, guillA: 0.10,
-      sweepOp: 'source-over', sweepA: 0.55, medalShadow: 'rgba(228,80,10,.32)', logo: 'onLight',
+      sweepOp: 'source-over', sweepA: 0.55, medalShadow: 'rgba(219,76,0,.32)', logo: 'onLight',
     },
     night: {
       bg: '#0F0D0A', card: '#FFFFFF', ink: '#FFF6EA', ink2: 'rgba(255,246,234,.74)', ink3: 'rgba(255,246,234,.50)',
       line: 'rgba(255,246,234,.12)', dot: 'rgba(255,246,234,.10)', blobA: 0.34, ribbonA: 0.22, guillA: 0.16,
-      sweepOp: 'screen', sweepA: 0.30, medalShadow: 'rgba(255,106,19,.45)', logo: 'onDark',
+      sweepOp: 'screen', sweepA: 0.30, medalShadow: 'rgba(255,102,0,.45)', logo: 'onDark',
     },
   };
 
@@ -159,7 +160,7 @@
       const cx = b.x * W + Math.cos(ph * b.k + b.ph) * b.orbit, cy = b.y * H + Math.sin(ph * b.k + b.ph) * b.orbit;
       const rad = b.rad * W;
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
-      const col = b.warm ? (id.flip ? '20,160,73' : '255,106,19') : (id.flip ? '255,106,19' : '20,160,73');
+      const col = b.warm ? (id.flip ? '19,120,7' : '255,102,0') : (id.flip ? '255,102,0' : '19,120,7');
       g.addColorStop(0, `rgba(${col},${th.blobA})`); g.addColorStop(1, `rgba(${col},0)`);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     }
@@ -276,7 +277,7 @@
         const ex = X0 + p * (nw + 60);
         ctx.save(); ctx.globalAlpha = out * Math.sin(p * Math.PI);
         const lg = ctx.createLinearGradient(0, ny - size, 0, ny + size * 0.3);
-        lg.addColorStop(0, 'rgba(255,178,62,0)'); lg.addColorStop(0.5, C.amber); lg.addColorStop(1, 'rgba(20,160,73,0)');
+        lg.addColorStop(0, 'rgba(255,178,62,0)'); lg.addColorStop(0.5, C.amber); lg.addColorStop(1, 'rgba(19,120,7,0)');
         ctx.fillStyle = lg; ctx.shadowColor = C.amber; ctx.shadowBlur = 30; ctx.fillRect(ex - 2, ny - size, 4, size * 1.3);
         ctx.restore();
       }
@@ -366,7 +367,7 @@
     // halo (breathing)
     const hr = R * (1.75 + 0.08 * Math.sin(ph * 2));
     const hg = ctx.createRadialGradient(0, 0, R * 0.6, 0, 0, hr);
-    hg.addColorStop(0, 'rgba(255,160,60,.42)'); hg.addColorStop(0.55, 'rgba(20,160,73,.14)'); hg.addColorStop(1, 'rgba(20,160,73,0)');
+    hg.addColorStop(0, 'rgba(255,160,60,.42)'); hg.addColorStop(0.55, 'rgba(19,120,7,.14)'); hg.addColorStop(1, 'rgba(19,120,7,0)');
     ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(0, 0, hr, 0, TAU); ctx.fill();
 
     // burst ring on reveal

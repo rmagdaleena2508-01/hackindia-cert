@@ -29,7 +29,7 @@ The GitHub repo is connected to Vercel. Every push to `main` updates the live si
 
 - **Moving certificate.** The border draws itself, a light sweeps left to right, the name writes on, then the rank badge pops and the QR code prints. Colors keep flowing, and the badge glows and twinkles.
 - **Every certificate looks different.** The certificate ID picks the ribbons, color fields, dot wave, banknote-style spiral pattern and badge petals. The same ID always gives the same look.
-- **Two themes.** Paper (light) and Night (dark), both in HackIndia orange and green.
+- **Two themes.** Paper (light) and Night (dark), both in the exact orange (`#FF6600`) and green (`#137807`) from the official HackIndia logo.
 - **Badge per tier.** Winner, 1st/2nd Runner-up, Finalist, Special Mention and Participant each get their own shape and color.
 - **Real check.** The QR code and link hold the details plus an ECDSA P-256 signature. `verify.html` checks it. If anyone changes the name or rank, the page says "not valid" and greys out the certificate.
 - **Video under 3 MB.** A 9-second MP4 at 1280×904 that loops with no jump (about 2.4 MB). Every frame is encoded one by one with WebCodecs, which takes about 2 seconds. The first frame shows the finished certificate, so LinkedIn's thumbnail looks right.
@@ -52,6 +52,5 @@ The GitHub repo is connected to Vercel. Every push to `main` updates the live si
 
 ## Still to do
 
-1. Decide whether to match the exact brand colors from the logo (orange `#FF6600`, green `#137807`). The certificate uses a brighter green, `#14A049`.
-2. Optional: point a custom domain (like `certificates.hackindia.xyz`) at the Vercel project.
-3. Optional: add a short-link service (`/v/HI26-XXXX`). The QR code gets much simpler, and you can cancel a certificate later.
+1. Optional: point a custom domain (like `certificates.hackindia.xyz`) at the Vercel project.
+2. Optional: add a short-link service (`/v/HI26-XXXX`). The QR code gets much simpler, and you can cancel a certificate later.
