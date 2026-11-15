@@ -48,9 +48,10 @@ The GitHub repo is connected to Vercel. Every push to `main` updates the live si
 | `verify.html` | Public check page |
 | `issuer-key.js` | Private key for signing on your own computer. Never uploaded |
 | `public-key.js` | Public key used by the check page |
+| `logo.js` + `assets/` | Official HackIndia logo from hackindia.org. `logo.js` holds it as data so video and PNG export work even when the page is opened from disk |
 
 ## Still to do
 
-1. Replace the drawn mark in `cert.js` (look for "brand mark") with the official HackIndia logo, and check the exact brand hex codes.
+1. Decide whether to match the exact brand colors from the logo (orange `#FF6600`, green `#137807`). The certificate uses a brighter green, `#14A049`.
 2. Optional: point a custom domain (like `certificates.hackindia.xyz`) at the Vercel project.
 3. Optional: add a short-link service (`/v/HI26-XXXX`). The QR code gets much simpler, and you can cancel a certificate later.

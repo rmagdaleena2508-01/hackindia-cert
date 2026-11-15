@@ -19,7 +19,7 @@ a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: un
 
 .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1360px; margin: 0 auto; padding: 22px 32px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 500; }
-.brand .mark { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, #FF6A13, #14A049); }
+.brand .mark { width: 26px; height: 26px; display: block; }
 .brand small { color: var(--ink-50); font-weight: 500; }
 .brand { white-space: nowrap; }
 .brand .mark { flex-shrink: 0; }

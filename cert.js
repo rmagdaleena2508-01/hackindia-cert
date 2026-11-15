@@ -14,12 +14,12 @@
     paper: {
       bg: '#FFF8EF', card: '#FFFFFF', ink: '#1B140F', ink2: 'rgba(27,20,15,.68)', ink3: 'rgba(27,20,15,.46)',
       line: 'rgba(27,20,15,.10)', dot: 'rgba(27,20,15,.13)', blobA: 0.30, ribbonA: 0.15, guillA: 0.10,
-      sweepOp: 'source-over', sweepA: 0.55, medalShadow: 'rgba(228,80,10,.32)',
+      sweepOp: 'source-over', sweepA: 0.55, medalShadow: 'rgba(228,80,10,.32)', logo: 'onLight',
     },
     night: {
       bg: '#0F0D0A', card: '#FFFFFF', ink: '#FFF6EA', ink2: 'rgba(255,246,234,.74)', ink3: 'rgba(255,246,234,.50)',
       line: 'rgba(255,246,234,.12)', dot: 'rgba(255,246,234,.10)', blobA: 0.34, ribbonA: 0.22, guillA: 0.16,
-      sweepOp: 'screen', sweepA: 0.30, medalShadow: 'rgba(255,106,19,.45)',
+      sweepOp: 'screen', sweepA: 0.30, medalShadow: 'rgba(255,106,19,.45)', logo: 'onDark',
     },
   };
 
@@ -111,8 +111,17 @@
     sans: '"Instrument Sans", ui-sans-serif, system-ui, sans-serif',
     mono: '"Geist Mono", ui-monospace, monospace',
   };
+  // Official logo images (see logo.js). Drawn once loaded; header falls back to text until then.
+  const LOGO = {};
+  function loadLogos() {
+    const src = window.HACKINDIA_LOGO || {};
+    return Promise.all(['onLight', 'onDark'].filter((k) => src[k]).map((k) => new Promise((res) => {
+      const im = new Image(); im.onload = () => { LOGO[k] = im; res(); }; im.onerror = res; im.src = src[k];
+    })));
+  }
   function ready() {
     return Promise.all([
+      loadLogos(),
       document.fonts.load(`400 100px ${F.serif}`), document.fonts.load(`italic 400 100px ${F.serif}`),
       document.fonts.load(`400 30px ${F.sans}`), document.fonts.load(`500 30px ${F.sans}`), document.fonts.load(`600 30px ${F.sans}`),
       document.fonts.load(`400 18px ${F.mono}`),
@@ -211,16 +220,17 @@
     {
       const dy = show(0.5, 1.4);
       ctx.save(); ctx.translate(0, dy);
-      // brand mark (generic; swap for the official logo file before launch)
-      const mx = 110, my = 104;
-      const mg = ctx.createLinearGradient(mx, my, mx + 48, my + 48); mg.addColorStop(0, C.orange); mg.addColorStop(1, C.green);
-      ctx.fillStyle = mg; rrect(ctx, mx, my, 48, 48, 13); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.beginPath(); ctx.moveTo(mx + 17, my + 15); ctx.lineTo(mx + 29, my + 24); ctx.lineTo(mx + 17, my + 33); ctx.stroke();
-      ctx.fillStyle = th.ink; ctx.font = `600 30px ${F.sans}`; ctx.textBaseline = 'alphabetic'; setLS(ctx, -0.4);
-      ctx.fillText(cert.event || 'HackIndia', mx + 66, my + 23);
+      // official HackIndia logo, then a hairline and the event name + venue
+      const mx = 110, my = 104, lh = 50;
+      const logo = LOGO[th.logo];
+      const lw = logo ? Math.round(lh * logo.naturalWidth / logo.naturalHeight) : 0;
+      if (logo) { ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(logo, mx, my - 1, lw, lh); }
+      const tx = logo ? mx + lw + 48 : mx;
+      if (logo) { ctx.fillStyle = th.line; ctx.fillRect(mx + lw + 24, my + 2, 1.5, lh - 6); }
+      ctx.fillStyle = th.ink; ctx.font = `600 26px ${F.sans}`; ctx.textBaseline = 'alphabetic'; setLS(ctx, -0.3);
+      ctx.fillText(cert.event || 'HackIndia', tx, my + 21);
       ctx.fillStyle = th.ink3; ctx.font = `500 17px ${F.sans}`; setLS(ctx, 0);
-      ctx.fillText(cert.venue ? `${cert.venue}` : 'Official certificate', mx + 66, my + 47);
+      ctx.fillText(cert.venue ? `${cert.venue}` : 'Official certificate', tx, my + 46);
       // right side
       ctx.textAlign = 'right';
       ctx.fillStyle = th.ink2; ctx.font = `600 17px ${F.sans}`; setLS(ctx, 4);
