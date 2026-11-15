@@ -82,7 +82,8 @@
     const res = await CertSign.verifyToken(token);
     $('empty').hidden = true; $('result').hidden = false;
     if (!res.cert) { $('result').hidden = true; $('empty').hidden = false; toast(res.reason); return; }
-    cert = { ...res.cert, verifyUrl: location.href };
+    // from disk, keep the link relative so the QR code never shows the local folder path
+    cert = { ...res.cert, verifyUrl: location.protocol === 'file:' ? 'verify.html' + location.hash : location.href };
     const tier = Cert.TIERS[cert.tier] || Cert.TIERS.participant;
     document.title = res.ok ? `${cert.name} · ${tier.label} · ${cert.event}` : 'Not valid · HackIndia certificate check';
     $('title').textContent = res.ok ? `${cert.name}, ${tier.label}` : 'This certificate is not valid';

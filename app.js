@@ -2,7 +2,8 @@
 (function () {
   const $ = (id) => document.getElementById(id);
   const today = new Date().toISOString().slice(0, 10);
-  const base = location.href.replace(/[#?].*$/, '').replace(/[^/]*$/, '');
+  // Opened from disk (file://): keep links relative so a QR code never prints the local folder path or username.
+  const base = location.protocol === 'file:' ? '' : location.href.replace(/[#?].*$/, '').replace(/[^/]*$/, '');
   const verifyUrlFor = (token) => base + 'verify.html#' + token;
 
   const SAMPLES = [
