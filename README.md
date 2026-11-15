@@ -4,7 +4,7 @@ Animated, signed hackathon certificates that people actually want to post.
 
 **Live:** https://hackindia-cert.vercel.app (studio) · https://hackindia-cert.vercel.app/verify.html (check page)
 
-**Code:** https://github.com/rmagdaleena2508-01/hackindia-cert (private)
+**Code:** https://github.com/rmagdaleena2508-01/hackindia-cert
 
 ## Run it
 
